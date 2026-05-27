@@ -31,6 +31,12 @@ xcodebuild -project QRMaker.xcodeproj -scheme QRMaker -configuration Release bui
 
 The `.app` bundle is output to `build/Build/Products/Release/QRMaker.app`.
 
+## Release Security
+
+- Release builds are expected to use a reproducible SwiftPM lockfile (`Package.resolved`) committed to git.
+- Release signing should include Hardened Runtime and timestamped code signatures.
+- Distribution artifacts should be notarized before external sharing.
+
 ## Directory Structure
 
 ```

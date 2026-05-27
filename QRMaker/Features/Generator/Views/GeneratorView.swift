@@ -163,7 +163,10 @@ struct GeneratorView: View {
     // MARK: - Text Input
 
     private var textInput: some View {
-        TextEditor(text: $viewModel.inputText)
+        TextEditor(text: Binding(
+            get: { viewModel.inputText },
+            set: { viewModel.setInputText($0) }
+        ))
             .font(.system(.body, design: .monospaced))
             .scrollContentBackground(.hidden)
             .padding(8)

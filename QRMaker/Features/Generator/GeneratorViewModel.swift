@@ -3,7 +3,7 @@ import Combine
 
 final class GeneratorViewModel: ObservableObject {
 
-    @Published var inputText: String = ""
+    @Published private(set) var inputText: String = ""
     @Published var pages: [QRCodePage] = []
     @Published var currentPage: Int = 0
     @Published var errorMessage: String?
@@ -41,7 +41,7 @@ final class GeneratorViewModel: ObservableObject {
     }
 
     func clear() {
-        inputText = ""
+        setInputText("")
     }
 
     func setInputText(_ text: String) {

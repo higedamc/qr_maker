@@ -66,7 +66,7 @@ struct GeneratorView: View {
     private var mainContent: some View {
         if isScanning {
             ScannerView(viewModel: scannerVM) { scannedText in
-                viewModel.inputText = scannedText
+                viewModel.setInputText(scannedText)
                 isScanning = false
                 scannerVM.stopScanning()
             }

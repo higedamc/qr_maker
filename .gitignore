@@ -19,7 +19,6 @@ build/
 # Swift Package Manager
 .build/
 .swiftpm/
-Package.resolved
 Packages/
 
 # macOS

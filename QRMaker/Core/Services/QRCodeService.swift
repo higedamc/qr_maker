@@ -69,6 +69,7 @@ enum QRCodeError: LocalizedError {
 final class QRCodeService {
 
     static let shared = QRCodeService()
+    static let maxSupportedBytes = maxPages * CorrectionLevel.L.maxBytes
 
     private static let maxPages = 20
 
@@ -77,12 +78,17 @@ final class QRCodeService {
     private init() {}
 
     func generate(from text: String, size: CGFloat = 512) -> Result<QRCodeResult, QRCodeError> {
-        let data = Data(text.utf8)
-        let totalBytes = data.count
+        let totalBytes = text.lengthOfBytes(using: .utf8)
 
         guard totalBytes > 0 else {
             return .failure(.empty)
         }
+
+        guard totalBytes <= Self.maxSupportedBytes else {
+            return .failure(.tooLarge(byteCount: totalBytes))
+        }
+
+        let data = Data(text.utf8)
 
         if let level = CorrectionLevel.bestLevel(forByteCount: totalBytes) {
             return generateSingle(data: data, level: level, size: size)

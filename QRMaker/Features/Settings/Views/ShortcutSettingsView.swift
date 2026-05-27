@@ -2,7 +2,7 @@ import KeyboardShortcuts
 import SwiftUI
 
 struct ShortcutSettingsView: View {
-    @AppStorage("autoClipboardImport") private var autoClipboard = true
+    @AppStorage("autoClipboardImport") private var autoClipboard = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {

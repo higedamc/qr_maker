@@ -20,6 +20,7 @@ final class GeneratorViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var autoAdvanceTimer: AnyCancellable?
     private let qrService = QRCodeService.shared
+    private let maxInputBytes = QRCodeService.maxSupportedBytes
 
     init() {
         $inputText
@@ -35,12 +36,24 @@ final class GeneratorViewModel: ObservableObject {
 
     func pasteFromClipboard() {
         if let text = ClipboardService.shared.read(), !text.isEmpty {
-            inputText = text
+            setInputText(text)
         }
     }
 
     func clear() {
         inputText = ""
+    }
+
+    func setInputText(_ text: String) {
+        guard text.lengthOfBytes(using: .utf8) <= maxInputBytes else {
+            pages = []
+            currentPage = 0
+            stopAutoAdvance()
+            errorMessage = "Input too large (max \(maxInputBytes) bytes)"
+            return
+        }
+
+        inputText = text
     }
 
     func nextPage() {

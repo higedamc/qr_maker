@@ -49,7 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let autoClipboard = UserDefaults.standard.bool(forKey: "autoClipboardImport")
         if autoClipboard, let text = ClipboardService.shared.read(), !text.isEmpty {
-            viewModel.inputText = text
+            viewModel.setInputText(text)
         }
 
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)

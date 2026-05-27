@@ -41,3 +41,4 @@ Packages/
 .idea/
 .vscode/
 *.code-workspace
+.cursor/

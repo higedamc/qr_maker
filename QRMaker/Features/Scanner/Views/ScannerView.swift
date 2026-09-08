@@ -6,19 +6,28 @@ struct ScannerView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            cameraPicker
+            cameraToolbar
             cameraPreview
+            statusText
             detectedResult
         }
         .onAppear { viewModel.startScanning() }
         .onDisappear { viewModel.stopScanning() }
     }
 
-    // MARK: - Camera Picker
+    // MARK: - Camera Toolbar
+
+    private var cameraToolbar: some View {
+        HStack(spacing: 8) {
+            cameraPicker
+            Spacer()
+            reconnectControl
+        }
+    }
 
     @ViewBuilder
     private var cameraPicker: some View {
-        if viewModel.availableCameras.count > 1 {
+        if !viewModel.availableCameras.isEmpty {
             Picker("Camera", selection: Binding(
                 get: { viewModel.selectedCameraID },
                 set: { viewModel.switchCamera(to: $0) }
@@ -29,6 +38,43 @@ struct ScannerView: View {
             }
             .pickerStyle(.menu)
             .labelsHidden()
+        }
+    }
+
+    @ViewBuilder
+    private var reconnectControl: some View {
+        if viewModel.isSearchingForPreferredCamera {
+            ProgressView()
+                .controlSize(.small)
+        } else if let name = viewModel.preferredCameraName, !viewModel.isPreferredCameraAvailable {
+            Button {
+                viewModel.reconnectPreferredCamera()
+            } label: {
+                Label("Connect \(name)", systemImage: "iphone.badge.play")
+                    .lineLimit(1)
+            }
+            .controlSize(.small)
+            .help("Try to reconnect to \(name) wirelessly")
+        } else {
+            Button {
+                viewModel.loadCameras()
+            } label: {
+                Image(systemName: "arrow.triangle.2.circlepath")
+            }
+            .buttonStyle(.borderless)
+            .help("Rescan cameras")
+        }
+    }
+
+    // MARK: - Status
+
+    @ViewBuilder
+    private var statusText: some View {
+        if let status = viewModel.statusMessage {
+            Text(status)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
     }
 
@@ -47,6 +93,29 @@ struct ScannerView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
+
+                    if viewModel.isCameraAccessDenied {
+                        Button {
+                            viewModel.openCameraPrivacySettings()
+                        } label: {
+                            Label("Open System Settings", systemImage: "gearshape")
+                        }
+                        .controlSize(.small)
+                    } else if viewModel.isSearchingForPreferredCamera {
+                        ProgressView()
+                            .controlSize(.small)
+                    } else {
+                        Button {
+                            if viewModel.preferredCameraID != nil, !viewModel.isPreferredCameraAvailable {
+                                viewModel.reconnectPreferredCamera()
+                            } else {
+                                viewModel.startScanning()
+                            }
+                        } label: {
+                            Label("Try Again", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                        .controlSize(.small)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
